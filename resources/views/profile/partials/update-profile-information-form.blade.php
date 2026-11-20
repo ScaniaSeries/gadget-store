@@ -13,9 +13,21 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    {{-- TAMBAHAN: enctype agar bisa upload file --}}
+    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6" enctype="multipart/form-data">
         @csrf
         @method('patch')
+
+        {{-- TAMBAHAN: foto profil --}}
+        <div>
+            <x-input-label for="photo" :value="__('Foto Profil')" />
+            <img src="{{ $user->photo_url }}" alt="Foto profil"
+                 class="mt-2 rounded-full object-cover"
+                 style="width: 90px; height: 90px;">
+            <input id="photo" name="photo" type="file" accept="image/*"
+                   class="mt-2 block w-full text-sm text-gray-600">
+            <x-input-error class="mt-2" :messages="$errors->get('photo')" />
+        </div>
 
         <div>
             <x-input-label for="name" :value="__('Name')" />

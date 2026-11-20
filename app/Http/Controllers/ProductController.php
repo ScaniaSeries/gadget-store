@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Categories;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
@@ -47,12 +48,27 @@ class ProductController extends Controller
             'brand'        => ['nullable', 'string', 'max:100'],
             'price'        => ['required', 'numeric', 'min:0'],
             'stock'        => ['required', 'integer', 'min:0'],
+            'deskripsi'    => ['nullable', 'string'],
+            'gambar'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
+
+        if ($request->hasFile('gambar')) {
+            $validated['gambar'] = $request->file('gambar')->store('products', 'public');
+        }
 
         Product::create($validated);
 
         return redirect()->route('products.index')->with('success', 'Produk berhasil ditambahkan.');
     }
+
+    // ====== TAMBAHAN: method show ======
+    public function show(Product $product)
+    {
+        $product->load('category');
+
+        return view('products.show', compact('product'));
+    }
+    // ====== AKHIR TAMBAHAN ======
 
     public function edit(Product $product)
     {
@@ -70,7 +86,16 @@ class ProductController extends Controller
             'brand'        => ['nullable', 'string', 'max:100'],
             'price'        => ['required', 'numeric', 'min:0'],
             'stock'        => ['required', 'integer', 'min:0'],
+            'deskripsi'    => ['nullable', 'string'],
+            'gambar'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
+
+        if ($request->hasFile('gambar')) {
+            if ($product->gambar) {
+                Storage::disk('public')->delete($product->gambar);
+            }
+            $validated['gambar'] = $request->file('gambar')->store('products', 'public');
+        }
 
         $product->update($validated);
 
@@ -79,6 +104,10 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        if ($product->gambar) {
+            Storage::disk('public')->delete($product->gambar);
+        }
+
         $product->delete();
 
         return redirect()->route('products.index')->with('success', 'Produk berhasil dihapus.');

@@ -5,7 +5,9 @@
 @section('content')
 <div class="d-flex justify-content-between mb-3">
     <h3>Kategori Produk</h3>
-    <a class="btn btn-primary" href="{{ route('categories.create') }}">Tambah Kategori</a>
+    @if(auth()->user()->isAdmin())
+        <a class="btn btn-primary" href="{{ route('categories.create') }}">Tambah Kategori</a>
+    @endif
 </div>
 
 <div class="card">
@@ -17,7 +19,9 @@
                     <th>Deskripsi</th>
                     <th>Jumlah Produk</th>
                     <th>Status</th>
-                    <th>Aksi</th>
+                    @if(auth()->user()->isAdmin())
+                        <th>Aksi</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -28,23 +32,25 @@
                         <td>{{ $category->products_count }}</td>
                         <td>
                             @if($category->is_active)
-                                <span class="badge bg-success">Aktif</span>
+                                <span class="badge badge-success">Aktif</span>
                             @else
-                                <span class="badge bg-secondary">Tidak Aktif</span>
+                                <span class="badge badge-secondary">Tidak Aktif</span>
                             @endif
                         </td>
-                        <td>
-                            <a class="btn btn-sm btn-warning" href="{{ route('categories.edit', $category) }}">Edit</a>
-                            <form class="d-inline" method="POST" action="{{ route('categories.destroy', $category) }}">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Hapus kategori?')">Hapus</button>
-                            </form>
-                        </td>
+                        @if(auth()->user()->isAdmin())
+                            <td class="text-nowrap">
+                                <a class="btn btn-sm btn-warning" href="{{ route('categories.edit', $category) }}">Edit</a>
+                                <form class="d-inline" method="POST" action="{{ route('categories.destroy', $category) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Hapus kategori?')">Hapus</button>
+                                </form>
+                            </td>
+                        @endif
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5">Belum ada kategori.</td>
+                        <td colspan="{{ auth()->user()->isAdmin() ? 5 : 4 }}">Belum ada kategori.</td>
                     </tr>
                 @endforelse
             </tbody>

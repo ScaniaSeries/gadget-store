@@ -5,7 +5,7 @@
 @section('content')
 <h3>Tambah Produk</h3>
 
-<form method="POST" action="{{ route('products.store') }}">
+<form method="POST" action="{{ route('products.store') }}" enctype="multipart/form-data">
     @csrf
 
     <div class="mb-3">
@@ -48,6 +48,29 @@
         <input type="number" name="stock" id="stock" class="form-control" value="{{ old('stock', 0) }}">
         @error('stock') <div class="text-danger">{{ $message }}</div> @enderror
     </div>
+
+    <div class="mb-3">
+        <label for="deskripsi" class="form-label">Deskripsi</label>
+        <textarea name="deskripsi" id="deskripsi" rows="4" class="form-control">{{ old('deskripsi') }}</textarea>
+        @error('deskripsi') <div class="text-danger">{{ $message }}</div> @enderror
+    </div>
+
+    <div class="mb-3">
+        <label for="gambar" class="form-label">Gambar</label>
+        <input type="file" name="gambar" id="gambar" class="form-control" accept="image/*">
+        @error('gambar') <div class="text-danger">{{ $message }}</div> @enderror
+        
+        
+       @if (!empty($product?->gambar))
+    <div class="mt-2">
+        <img src="{{ asset('storage/' . $product->gambar) }}"
+             alt="Gambar Produk"
+             class="img-thumbnail"
+             style="max-height: 100px;">
+    </div>
+@endif
+      </div>
+
 
     <button type="submit" class="btn btn-primary">Simpan</button>
     <a href="{{ route('products.index') }}" class="btn btn-secondary">Batal</a>
